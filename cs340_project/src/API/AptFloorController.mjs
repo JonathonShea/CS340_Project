@@ -1,25 +1,7 @@
 import express from 'express';
 const PORT = 3000;
-import mysql from 'mysql';
 import cors from 'cors';
-
-
-var connection = mysql.createConnection({
-    host: 'classmysql.engr.oregonstate.edu',
-    user: 'cs340_sheajon',
-    password: '4132',
-    database: 'cs340_sheajon'
-});
-
-connection.connect(function(err) {
-    if (err) {
-        console.error('error connecting: ' + err.stack);
-        return;
-    }
-
-    console.log('connected as id ' + connection.threadId);
-});
-
+import {connection} from "./DatabaseConnection.js";
 
 const app = express();
 app.use(cors());
@@ -34,6 +16,21 @@ app.get('/aptFloors', function(req, res)
         }
         res.json(results);
     });                                                  // an object where 'data' is equal to the 'rows' we
+});
+
+app.post('/aptFloors', (req, res) =>
+{
+    let checkQuery = "IF NOT EXISTS(SELECT );"
+    let insertQuery = "INSERT INTO `AptFloors` (floorNum,fireExits) VALUES (?,?);";
+    let floorNum = req.body.floorNum;
+    let fireExits = req.body.fireExits;
+    connection.query(insertQuery, [floorNum,fireExits] ,(error, rows) => {
+        if(error){
+            res.write(JSON.stringify(error));
+            res.end();
+        }
+        res.write(rows);
+    });
 });
 
 
