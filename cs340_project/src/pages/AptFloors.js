@@ -14,6 +14,12 @@ function AptFloors() {
 
 
     const [aptFloorList, setAptFloorList] = useState([]);
+    const [floorNum, setFloorNum] = useState([]);
+    const [fireExits, setFireExits] = useState([]);
+    const toggleField = () => setShowField(!showField);
+    const [showField, setShowField] = useState(false);
+
+
 
     const loadAptFloors = async () => {
         const response = await fetch('http://localhost:3000/aptFloors');
@@ -22,16 +28,32 @@ function AptFloors() {
     }
 
 
+    function onAdd() {
+        addAptFloor();
+    }
+
+    const addAptFloor = async () => {
+        const responseOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ floorNum: floorNum, fireExits: fireExits })
+        }
+        await fetch('http://localhost:3000/aptFloors');
+        await loadAptFloors();
+    }
+
     const AptFloorInput = () => {
         return<tr>
                     <td>
-                        <input placeholder="Floor number"/>
+                        <input placeholder="Floor number"
+                               onChange={e => setFloorNum(e.target.value)}/>
                     </td>
                     <td>
-                        <input placeholder="Fire exits"/>
+                        <input placeholder="Fire exits"
+                            onChange={e => setFireExits(e.target.value)}/>
                     </td>
                     <td>
-                        <MdAdd/>
+                        <MdAdd onClick = { () => onAdd()}/>
                     </td>
                     <td>
                         <MdCancel/>
@@ -48,15 +70,13 @@ function AptFloors() {
         <SideBar />
         <h1 class = "DatabaseTitle">Apartment Floors</h1>
         <p class = "DatabaseText">Apartment Floor table tracks floor specific information of each apartment including fire exits.</p>
-        <AptFloorList aptFloors={aptFloorList}/>
+        <AptFloorList aptFloors={aptFloorList} toggleField = {toggleField} showField = {showField}/>
         <MdAdd onClick={onAddClick}>Add New Apt Floor</MdAdd>
         </>
     )
 }
 
-// TODO: replace dummy data with DB inputs.
-// Row of AptFloor data
-function AptFloorList({ aptFloors}) {
+function AptFloorList({ aptFloors, onAddClick, AptFloorInput, toggleField, showField}) {
     return (
         <table id="aptFloors">
             <thead>
@@ -70,7 +90,15 @@ function AptFloorList({ aptFloors}) {
             <tbody>
             {aptFloors.map((aptFloor, i) => <AptFloor aptFloor={aptFloor} key={i} />)}
             </tbody>
+            <tbody>
+            </tbody>
+            <tr>
+                <MdAdd onClick={() => {toggleField()
+                }}/>
+                {showField ? <AptFloorInput/>:<text>testing 123</text>}
+            </tr>
         </table>
+
     );
 }
 
